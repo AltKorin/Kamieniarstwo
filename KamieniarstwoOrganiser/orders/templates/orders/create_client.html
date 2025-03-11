@@ -1,0 +1,33 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Stwórz Klienta{% endblock %}
+
+{% block content %}
+<h2>Stwórz Klienta</h2>
+<form method="post" enctype="multipart/form-data" class="form-container">
+    {% csrf_token %}
+    <table class="table">
+        {% for field in form %}
+        <tr class="form-group">
+            <td>
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            </td>
+            <td>
+                {{ field }}
+            </td>
+            {% if field.help_text %}
+            <td>
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+            </td>
+            {% endif %}
+            {% for error in field.errors %}
+            <td>
+                <div class="text-danger">{{ error }}</div>
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    <button type="submit" class="btn btn-primary">Stwórz Klienta</button>
+</form>
+{% endblock %}

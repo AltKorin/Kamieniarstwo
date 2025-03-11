@@ -1,0 +1,25 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Zadania Pracownika{% endblock %}
+
+{% block content %}
+<h2>Zadania Pracownika: {{ employee.first_name }} {{ employee.last_name }}</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nazwa zadania</th>
+            <th>Status</th>
+            <th>Opis</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.name }}</td>
+            <td>{{ task.completed|yesno:"Wykonane,Niewykonane" }}</td>
+            <td>{{ task.description }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

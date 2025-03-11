@@ -1,0 +1,27 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Archiwum{% endblock %}
+
+{% block content %}
+<h2>Archiwum</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Klient</th>
+            <th>Opis</th>
+            <th>Data zakończenia</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in archived_orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.client }}</td>
+            <td>{{ order.description }}</td>
+            <td>{{ order.completion_date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

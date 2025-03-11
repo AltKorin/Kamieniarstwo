@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Kamieniarstwo Organiser{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <!-- Boczny pasek nawigacyjny -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark flex-column">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#sideNavbar" aria-controls="sideNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="sideNavbar">
+            <ul class="navbar-nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Start</a></li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item nav-link">Dzień dobry, {{ user.username }}</li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Panel główny</a></li>
+                    
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Zaloguj</a></li>
+                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Stwórz Pracownika</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'create_client' %}">Stwórz Klienta</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'create_order' %}">Stwórz Zlecenie</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'create_task' %}">Stwórz Zadanie</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'task_template_list' %}">Szablony Zleceń</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'clients' %}">Klienci</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'orders' %}">Zlecenia</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'payment_list' %}">Płatności</a></li> <!-- Dodano link do płatności -->
+                <li class="nav-item"><a class="nav-link" href="{% url 'archive' %}">Archiwum</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'reports' %}">Raporty</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'employees' %}">Pracownicy</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'task_list' %}">Zadania</a></li> <!-- Dodano link do listy zadań -->
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Wyloguj</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let startX = 0;
+            let navbar = document.querySelector(".navbar");
+
+            document.addEventListener("touchstart", function (e) {
+                startX = e.touches[0].clientX;
+            });
+
+            document.addEventListener("touchend", function (e) {
+                let endX = e.changedTouches[0].clientX;
+                let difference = endX - startX;
+
+                if (difference > 100) {
+                    // Swipe right (otwieranie menu)
+                    navbar.classList.add("active");
+                } else if (difference < -100) {
+                    // Swipe left (zamykanie menu)
+                    navbar.classList.remove("active");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

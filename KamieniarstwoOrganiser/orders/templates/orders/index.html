@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Kamieniarstwo Organiser</title>
+</head>
+<body>
+    <h1>Lista zleceń</h1>
+    {% if orders %}
+        <ul>
+            {% for order in orders %}
+                <li>{{ order }} - Status: {{ order.status }} - Progres: {{ order.progress }}%</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Brak zleceń.</p>
+    {% endif %}
+</body>
+</html>

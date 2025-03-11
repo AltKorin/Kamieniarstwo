@@ -1,0 +1,37 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Klienci{% endblock %}
+
+{% block content %}
+<h2>Klienci</h2>
+
+<!-- Przycisk dodawania nowego klienta -->
+<a href="{% url 'create_client' %}" class="btn btn-primary mb-3">Dodaj Klienta</a>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Imię</th>
+            <th>Nazwisko</th>
+            <th>Telefon</th>
+            <th>Email</th>
+            <th>Adres</th>
+            <th>PESEL</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client.id }}</td>
+            <td>{{ client.first_name }}</td>
+            <td>{{ client.last_name }}</td>
+            <td>{{ client.phone }}</td>
+            <td>{{ client.email }}</td>
+            <td>{{ client.mailing_address }}</td>
+            <td>{{ client.pesel }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Panel główny{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="display-4">Panel główny</h1>
+    <p class="lead">Przeglądaj i zarządzaj swoimi zleceniami, klientami, płatnościami i zadaniami.</p>
+    <hr class="my-4">
+
+    <!-- Sekcja podsumowania -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Zlecenia</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ orders.count }}</h5>
+                    <p class="card-text">Liczba zleceń</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Klienci</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ clients.count }}</h5>
+                    <p class="card-text">Liczba klientów</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Płatności</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ payments.count }}</h5>
+                    <p class="card-text">Liczba płatności</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Zadania</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ tasks.count }}</h5>
+                    <p class="card-text">Liczba zadań</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Pracownicy</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ employees.count }}</h5>
+                    <p class="card-text">Liczba pracowników</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Zlecenia</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Klient</th>
+                <th>Typ zlecenia</th>
+                <th>Status</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.client }}</td>
+                <td>{{ order.get_order_type_display }}</td>
+                <td>{{ order.get_status_display }}</td>
+                <td>
+                    <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-warning">Edytuj</a>
+                    <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-danger">Usuń</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Klienci</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Telefon</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+            <tr>
+                <td>{{ client.id }}</td>
+                <td>{{ client.first_name }}</td>
+                <td>{{ client.last_name }}</td>
+                <td>{{ client.phone }}</td>
+                <td>
+                    <a href="{% url 'edit_client' client.id %}" class="btn btn-sm btn-warning">Edytuj</a>
+                    <a href="{% url 'delete_client' client.id %}" class="btn btn-sm btn-danger">Usuń</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Płatności</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Zlecenie</th>
+                <th>Kwota</th>
+                <th>Data</th>
+                <th>Klient</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.id }}</td>
+                <td>{{ payment.order }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.date }}</td>
+                <td>{{ payment.client }}</td>
+                <td>
+                    <a href="{% url 'edit_payment' payment.id %}" class="btn btn-sm btn-warning">Edytuj</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Zadania</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nazwa</th>
+                <th>Przydzielone do</th>
+                <th>Status</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.id }}</td>
+                <td>{{ task.name }}</td>
+                <td>{{ task.assigned_to }}</td>
+                <td>{{ task.completed|yesno:"Zakończone,Niezakończone" }}</td>
+                <td>
+                    <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-warning">Edytuj</a>
+                    <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-danger">Usuń</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Pracownicy</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Stanowisko</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+            <tr>
+                <td>{{ employee.id }}</td>
+                <td>{{ employee.first_name }}</td>
+                <td>{{ employee.last_name }}</td>
+                <td>{{ employee.position }}</td>
+                <td>
+                    <a href="{% url 'edit_employee' employee.id %}" class="btn btn-sm btn-warning">Edytuj</a>
+                    <a href="{% url 'delete_employee' employee.id %}" class="btn btn-sm btn-danger">Usuń</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}View Order{% endblock %}
+
+{% block content %}
+<h2>View Order</h2>
+<p>Client: {{ order.client }}</p>
+<p>Type: {{ order.get_order_type_display }}</p>
+<p>Status: {{ order.get_status_display }}</p>
+<p>Progress: {{ order.progress }}%</p>
+
+<h3>Tasks</h3>
+<ul>
+    {% for task in tasks %}
+    <li>{{ task.name }} - {% if task.completed %}Completed{% else %}Not Completed{% endif %}</li>
+    {% endfor %}
+</ul>
+
+<h3>Photos</h3>
+<ul>
+    {% for photo in photos %}
+    <li><img src="{{ photo.image.url }}" alt="Photo {{ photo.id }}"></li>
+    {% endfor %}
+</ul>
+{% endblock %}

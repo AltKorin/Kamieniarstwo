@@ -1,0 +1,15 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Strona główna{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Witamy w Kamieniarstwo Organiser</h1>
+    <p class="lead">Wybierz jedną z opcji poniżej:</p>
+    <hr class="my-4">
+    <div class="btn-group" role="group" aria-label="Opcje">
+        <a href="{% url 'create_client' %}" class="btn btn-primary btn-lg">Stwórz Klienta</a>
+        <a href="{% url 'create_order' %}" class="btn btn-secondary btn-lg">Stwórz Zlecenie</a>
+    </div>
+</div>
+{% endblock %}

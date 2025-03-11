@@ -1,0 +1,29 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Raporty{% endblock %}
+
+{% block content %}
+<h2>Raporty</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Klient</th>
+            <th>Opis</th>
+            <th>Data</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+        <tr>
+            <td>{{ report.id }}</td>
+            <td>{{ report.client }}</td>
+            <td>{{ report.description }}</td>
+            <td>{{ report.date }}</td>
+            <td>{{ report.status }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
