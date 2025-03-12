@@ -22,4 +22,6 @@
     <li><img src="{{ photo.image.url }}" alt="Photo {{ photo.id }}"></li>
     {% endfor %}
 </ul>
+
+<a href="{% url 'edit_order' order.id %}" class="btn btn-warning">Edit Order</a>
 {% endblock %}

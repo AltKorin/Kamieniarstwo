@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
-from .forms import EmployeeEditForm, SignUpForm, OrderForm, ShortOrderForm, TaskForm, SubTaskForm, PaymentForm
-from .models import Order, Task, SubTask, Photo, Client, Payment, Employee, TaskTemplate
+from .forms import EmployeeEditForm, SignUpForm, OrderForm, ShortOrderForm, TaskForm, SubTaskForm, PaymentForm, MaterialForm
+from .models import Order, Task, SubTask, Photo, Client, Payment, Employee, TaskTemplate, Material
 from django.contrib.auth import views as auth_views
 from django.db import IntegrityError
 from decimal import Decimal, InvalidOperation
@@ -54,20 +54,28 @@ def add_order(request):
 def home(request):
     return render(request, 'orders/home.html')
 
-@login_required
 def dashboard(request):
     orders = Order.objects.all()
     clients = Client.objects.all()
     payments = Payment.objects.all()
     tasks = Task.objects.all()
     employees = Employee.objects.all()
-    return render(request, 'orders/dashboard.html', {
+
+    for order in orders:
+        total_paid = order.advance_payment or Decimal('0.00')
+        total_paid += sum(payment.amount for payment in Payment.objects.filter(order=order))
+        order.total_paid = total_paid
+        order.total_cost = order.total_cost or Decimal('0.00')
+        order.remaining_payment = order.total_cost - order.total_paid
+
+    context = {
         'orders': orders,
         'clients': clients,
-        'tasks': tasks,
         'payments': payments,
+        'tasks': tasks,
         'employees': employees,
-    })
+    }
+    return render(request, 'orders/dashboard.html', context)
 
 @login_required
 def clients(request):
@@ -116,7 +124,7 @@ def edit_order(request, order_id):
 def calculate_total_cost(order):
     # Oblicz total_cost na podstawie pól zamówienia
     total_cost = Decimal('0.00')
-    price_fields = ['border_price', 'frame_price', 'main_plate_price', 'lamp_price', 'vase_price', 'ball_price', 'covering_price', 'curbs_price', 'monument_cost', 'old_monument_removal', 'cemetery_fee', 'transport_cost', 'other_costs']
+    price_fields = ['border_price', 'frame_price', 'main_plate_price', 'lamp_price', 'vase_price', 'ball_price', 'other_accessories_price', 'covering_price', 'monument_cost', 'old_monument_removal', 'cemetery_fee', 'transport_cost', 'other_costs_price']
     for field in price_fields:
         value = getattr(order, field, 0)
         if value:
@@ -242,20 +250,34 @@ def create_order(request):
     if request.method == 'POST':
         form = OrderForm(request.POST, request.FILES)
         if form.is_valid():
-            order = form.save()
+            order = form.save(commit=False)
+            # Oblicz total_cost
+            total_cost = Decimal('0.00')
+            price_fields = ['lamp_price', 'vase_price', 'ball_price', 'covering_price', 'monument_cost', 'old_monument_removal', 'cemetery_fee', 'transport_cost', 'other_costs_price']
+            for field in price_fields:
+                value = getattr(order, field, 0)
+                if value:
+                    try:
+                        total_cost += Decimal(value)
+                    except InvalidOperation:
+                        pass  # Ignoruj wartości, które nie mogą być przekonwertowane na Decimal
+            order.total_cost = total_cost
+            order.save()
             # Dodaj zadania na podstawie wybranego szablonu
             template = order.template
             task_templates = TaskTemplate.objects.filter(order_template=template)
             for task_template in task_templates:
                 Task.objects.create(
                     order=order,
+                    task_template=task_template,  # Ustawienie task_template
                     name=task_template.name,
                     description=task_template.description
                 )
-            return redirect('home')
+            return redirect('orders')
     else:
         form = OrderForm()
-    return render(request, 'orders/create_order.html', {'form': form})
+    boolean_fields = ['lamp', 'vase', 'ball', 'covering']
+    return render(request, 'orders/create_order.html', {'form': form, 'booleanFields': boolean_fields})
 
 @login_required
 def edit_payment(request, payment_id):
@@ -380,4 +402,29 @@ def add_task(request, template_id):
     else:
         form = TaskForm(initial={'task_template': task_template})
     return render(request, 'orders/add_task.html', {'form': form, 'task_template': task_template})
+
+def material_list(request):
+    materials = Material.objects.all()
+    return render(request, 'orders/material_list.html', {'materials': materials})
+
+def material_create(request):
+    if request.method == 'POST':
+        form = MaterialForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('material_list')
+    else:
+        form = MaterialForm()
+    return render(request, 'orders/material_form.html', {'form': form})
+
+def material_edit(request, pk):
+    material = get_object_or_404(Material, pk=pk)
+    if request.method == 'POST':
+        form = MaterialForm(request.POST, instance=material)
+        if form.is_valid():
+            form.save()
+            return redirect('material_list')
+    else:
+        form = MaterialForm(instance=material)
+    return render(request, 'orders/material_form.html', {'form': form})
 

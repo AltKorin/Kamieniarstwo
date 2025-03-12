@@ -16,6 +16,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ orders.count }}</h5>
                     <p class="card-text">Liczba zleceń</p>
+                    <a href="{% url 'create_order' %}" class="btn btn-light">Dodaj Zlecenie</a>
                 </div>
             </div>
         </div>
@@ -25,6 +26,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ clients.count }}</h5>
                     <p class="card-text">Liczba klientów</p>
+                    <a href="{% url 'create_client' %}" class="btn btn-light">Dodaj Klienta</a>
                 </div>
             </div>
         </div>
@@ -34,6 +36,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ payments.count }}</h5>
                     <p class="card-text">Liczba płatności</p>
+                    <a href="{% url 'create_payment' %}" class="btn btn-light">Dodaj Płatność</a>
                 </div>
             </div>
         </div>
@@ -43,6 +46,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ tasks.count }}</h5>
                     <p class="card-text">Liczba zadań</p>
+                    <a href="{% url 'create_task' %}" class="btn btn-light">Dodaj Zadanie</a>
                 </div>
             </div>
         </div>
@@ -52,6 +56,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ employees.count }}</h5>
                     <p class="card-text">Liczba pracowników</p>
+                    <a href="{% url 'signup' %}" class="btn btn-light">Dodaj Pracownika</a>
                 </div>
             </div>
         </div>
@@ -63,8 +68,11 @@
             <tr>
                 <th>ID</th>
                 <th>Klient</th>
-                <th>Typ zlecenia</th>
+                <th>Szablon zamówienia</th>
                 <th>Status</th>
+                <th>Kwota całkowita</th>
+                <th>Wpłacono</th>
+                <th>Pozostało do zapłaty</th>
                 <th>Akcje</th>
             </tr>
         </thead>
@@ -73,8 +81,11 @@
             <tr>
                 <td>{{ order.id }}</td>
                 <td>{{ order.client }}</td>
-                <td>{{ order.get_order_type_display }}</td>
+                <td>{{ order.template }}</td>
                 <td>{{ order.get_status_display }}</td>
+                <td>{{ order.total_cost }}</td>
+                <td>{{ order.total_paid }}</td>
+                <td>{{ order.remaining_payment }}</td>
                 <td>
                     <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-warning">Edytuj</a>
                     <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-danger">Usuń</a>
@@ -144,6 +155,8 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Zlecenie</th>
+                <th>Szablon zamówienia</th>
                 <th>Nazwa</th>
                 <th>Przydzielone do</th>
                 <th>Status</th>
@@ -154,6 +167,8 @@
             {% for task in tasks %}
             <tr>
                 <td>{{ task.id }}</td>
+                <td>{{ task.order }}</td>
+                <td>{{ task.task_template }}</td>
                 <td>{{ task.name }}</td>
                 <td>{{ task.assigned_to }}</td>
                 <td>{{ task.completed|yesno:"Zakończone,Niezakończone" }}</td>

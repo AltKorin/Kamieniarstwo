@@ -1,0 +1,28 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Lista Materiałów{% endblock %}
+
+{% block content %}
+<h2>Lista Materiałów</h2>
+<a href="{% url 'material_create' %}" class="btn btn-primary mb-3">Dodaj Materiał</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nazwa</th>
+            <th>Cena</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for material in materials %}
+        <tr>
+            <td>{{ material.name }}</td>
+            <td>{{ material.price }}</td>
+            <td>
+                <a href="{% url 'material_edit' material.pk %}" class="btn btn-sm btn-warning">Edytuj</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

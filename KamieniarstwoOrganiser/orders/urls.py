@@ -38,4 +38,7 @@ urlpatterns = [
     path('add_task_template/', views.add_task_template, name='add_task_template'),
     path('task_template_list/', views.task_template_list, name='task_template_list'),
     path('add_task/<int:template_id>/', views.add_task, name='add_task'),
+    path('materials/', views.material_list, name='material_list'),
+    path('materials/new/', views.material_create, name='material_create'),
+    path('materials/edit/<int:pk>/', views.material_edit, name='material_edit'),
 ]

@@ -24,6 +24,24 @@ class EmployeeEditForm(UserChangeForm):
         model = User
         fields = ('username', 'email', 'first_name', 'last_name', 'position')
 
+class MaterialForm(forms.ModelForm):
+    class Meta:
+        model = Material
+        fields = ['name', 'price']
+
+class MaterialSelectWidget(forms.Select):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
+        if value:
+            # Jeśli value jest instancją ModelChoiceIteratorValue, pobierz jej właściwą wartość
+            pk = value.value if hasattr(value, 'value') else value
+            try:
+                material = Material.objects.get(pk=pk)
+                option['attrs']['data-price'] = str(material.price)
+            except Material.DoesNotExist:
+                option['attrs']['data-price'] = '0'
+        return option
+
 class OrderForm(forms.ModelForm):
     completion_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False, label='Termin wykonania nagrobka')
 
@@ -31,12 +49,12 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = [
             'client', 'template', 'description', 'status', 'city', 'street', 'plot',
-            'grave_type', 'grave_size', 'border_material', 'border_dimensions',
-            'frame_material', 'frame_height', 'main_plate_material', 'main_plate_dimensions',
-            'lamp', 'lamp_price', 'vase', 'vase_price', 'ball', 'ball_price', 'other_accessories',
-            'inscription', 'letter_color', 'font', 'inscription_image', 'covering', 'covering_price',
-            'covering_quantity', 'curbs_price', 'curbs_quantity', 'monument_cost', 'old_monument_removal',
-            'cemetery_fee', 'transport_cost', 'other_costs', 'total_cost', 'completion_date', 'advance_payment', 'payment_method'
+            'grave_type', 'grave_size', 'border_material',
+            'frame_material', 'main_plate_material',
+            'lamp', 'lamp_price', 'vase', 'vase_price', 'ball', 'ball_price', 'other_accessories', 'other_accessories_price',
+            'inscription', 'letter_color', 'font', 'inscription_image', 'covering', 'covering_material', 'covering_quantity',
+            'curbs_quantity', 'monument_cost', 'old_monument_removal',
+            'cemetery_fee', 'transport_cost', 'other_costs', 'other_costs_price', 'completion_date', 'advance_payment', 'payment_method'
         ]
         labels = {
             'client': 'Klient',
@@ -66,10 +84,9 @@ class OrderForm(forms.ModelForm):
             'font': 'Czcionka',
             'inscription_image': 'Zdjęcie z rozkładu treści tablicy',
             'covering': 'Obłożenie',
-            'covering_price': 'Cena m2',
+            'covering_material': 'Materiał obłożenia',
             'covering_quantity': 'Ilość m2',
-            'curbs_price': 'Cena mb',
-            'curbs_quantity': 'Ilość mb',
+            'curbs_quantity': 'Ilość mb krawężnika',
             'monument_cost': 'Koszt wykonania nagrobka',
             'old_monument_removal': 'Demontaż starego nagrobka',
             'cemetery_fee': 'Opłata cmentarna',
@@ -83,6 +100,7 @@ class OrderForm(forms.ModelForm):
         widgets = {
             'grave_type': forms.Select(choices=[('ziemna', 'Ziemna'), ('grobowiec', 'Grobowiec')]),
             'grave_size': forms.Select(choices=[('pojedynczy', 'Pojedynczy'), ('poltorak', 'Półtorak'), ('podwojny', 'Podwójny')]),
+            'covering_material': MaterialSelectWidget(),
         }
 
 class ShortOrderForm(forms.ModelForm):

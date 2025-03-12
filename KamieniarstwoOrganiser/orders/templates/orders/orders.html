@@ -13,6 +13,7 @@
             <th>Opis</th>
             <th>Data</th>
             <th>Status</th>
+            <th>Akcje</th> <!-- Dodano kolumnę Akcje -->
         </tr>
     </thead>
     <tbody>
@@ -23,6 +24,10 @@
             <td>{{ order.description }}</td>
             <td>{{ order.created_at }}</td>
             <td>{{ order.status }}</td>
+            <td>
+                <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-warning">Edytuj</a>
+                <a href="{% url 'view_order' order.id %}" class="btn btn-sm btn-info">Zobacz</a>
+            </td> <!-- Dodano przyciski Edytuj i Zobacz -->
         </tr>
         {% endfor %}
     </tbody>

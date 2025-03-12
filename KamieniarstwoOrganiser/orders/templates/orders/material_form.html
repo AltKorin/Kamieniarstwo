@@ -1,0 +1,13 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Dodaj/Edytuj Materiał{% endblock %}
+
+{% block content %}
+<h2>Dodaj/Edytuj Materiał</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Zapisz</button>
+    <a href="{% url 'material_list' %}" class="btn btn-secondary">Anuluj</a>
+</form>
+{% endblock %}
