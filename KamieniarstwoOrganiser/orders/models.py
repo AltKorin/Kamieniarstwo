@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -73,11 +74,11 @@ class Order(models.Model):
     frame_material = models.ForeignKey(Material, on_delete=models.SET_NULL, null=True, related_name='frame_material')
     main_plate_material = models.ForeignKey(Material, on_delete=models.SET_NULL, null=True, related_name='main_plate_material')
     lamp = models.BooleanField("Lampion", default=False)
-    lamp_price = models.DecimalField("Cena lampionu", max_digits=10, decimal_places=2, blank=True, null=True)
+    lamp_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Cena lampy')
     vase = models.BooleanField("Wazon", default=False)
-    vase_price = models.DecimalField("Cena wazonu", max_digits=10, decimal_places=2, blank=True, null=True)
+    vase_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Cena wazonu')
     ball = models.BooleanField("Kula", default=False)
-    ball_price = models.DecimalField("Cena kuli", max_digits=10, decimal_places=2, blank=True, null=True)
+    ball_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Cena kuli')
     other_accessories = models.TextField("Inne akcesoria", blank=True, null=True)
     other_accessories_price = models.DecimalField("Cena innych akcesoriów", max_digits=10, decimal_places=2, blank=True, null=True)
     inscription = models.TextField("Litery", blank=True, null=True)
@@ -118,8 +119,50 @@ class Order(models.Model):
         total = tasks.count()
         return int((completed / total) * 100)
     
+    def calculate_total_cost(self):
+        total = 0
+        if self.lamp and self.lamp_price:
+            total += self.lamp_price
+        if self.vase and self.vase_price:
+            total += self.vase_price
+        if self.ball and self.ball_price:
+            total += self.ball_price
+        if self.covering and self.covering_material and self.covering_quantity:
+            total += self.covering_material.price * self.covering_quantity + 70
+        if self.other_accessories_price:
+            total += self.other_accessories_price
+        total += self.monument_cost or 0
+        total += self.old_monument_removal or 0
+        total += self.cemetery_fee or 0
+        total += self.transport_cost or 0
+        total += self.other_costs_price or 0
+        return total
+    
+    def calculate_total_paid(self):
+        total_paid = self.advance_payment or Decimal('0.00')
+        total_paid += sum(payment.amount for payment in Payment.objects.filter(order=self))
+        return total_paid
+    
+    def calculate_remaining_payment(self):
+        total_cost = self.total_cost or Decimal('0.00')
+        total_paid = self.calculate_total_paid()
+        return total_cost - total_paid
+
+
+    def save(self, *args, **kwargs):
+        self.total_cost = self.calculate_total_cost()
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return f"Zlecenie {self.id} dla {self.client}"
+    
+    @property
+    def total_paid(self):
+        return self.calculate_total_paid()
+
+    @property
+    def remaining_payment(self):
+        return self.calculate_remaining_payment()
 
 class TaskTemplate(models.Model):
     order_template = models.ForeignKey(OrderTemplate, on_delete=models.CASCADE, related_name='task_templates')

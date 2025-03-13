@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from decimal import Decimal, InvalidOperation
 from .forms import ClientCreationForm
 from .forms import TaskTemplateForm
+from .forms import ClientForm
 
 def signup(request):
     if request.method == 'POST':
@@ -61,13 +62,6 @@ def dashboard(request):
     tasks = Task.objects.all()
     employees = Employee.objects.all()
 
-    for order in orders:
-        total_paid = order.advance_payment or Decimal('0.00')
-        total_paid += sum(payment.amount for payment in Payment.objects.filter(order=order))
-        order.total_paid = total_paid
-        order.total_cost = order.total_cost or Decimal('0.00')
-        order.remaining_payment = order.total_cost - order.total_paid
-
     context = {
         'orders': orders,
         'clients': clients,
@@ -108,31 +102,18 @@ def view_order(request, order_id):
     photos = order.photos.all()
     return render(request, 'orders/view_order.html', {'order': order, 'tasks': tasks, 'photos': photos})
 
+@login_required
 def edit_order(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
+    order = get_object_or_404(Order, pk=order_id)
     if request.method == 'POST':
-        form = OrderForm(request.POST, instance=order)
+        form = OrderForm(request.POST, request.FILES, instance=order)
         if form.is_valid():
-            order = form.save(commit=False)
-            order.total_cost = calculate_total_cost(order)  # Oblicz total_cost
-            order.save()
+            form.save()
             return redirect('dashboard')
     else:
         form = OrderForm(instance=order)
-    return render(request, 'orders/edit_order.html', {'form': form, 'booleanFields': ['border', 'frame', 'main_plate', 'lamp', 'vase', 'ball', 'covering']})
-
-def calculate_total_cost(order):
-    # Oblicz total_cost na podstawie pól zamówienia
-    total_cost = Decimal('0.00')
-    price_fields = ['border_price', 'frame_price', 'main_plate_price', 'lamp_price', 'vase_price', 'ball_price', 'other_accessories_price', 'covering_price', 'monument_cost', 'old_monument_removal', 'cemetery_fee', 'transport_cost', 'other_costs_price']
-    for field in price_fields:
-        value = getattr(order, field, 0)
-        if value:
-            try:
-                total_cost += Decimal(value)
-            except InvalidOperation:
-                pass  # Ignoruj wartości, które nie mogą być przekonwertowane na Decimal
-    return total_cost
+    boolean_fields = ['lamp', 'vase', 'ball', 'covering']
+    return render(request, 'orders/edit_order.html', {'form': form, 'order_id': order_id, 'booleanFields': boolean_fields})
 
 def delete_order(request, order_id):
     order = Order.objects.get(id=order_id)
@@ -222,14 +203,14 @@ def create_client(request):
 
 @login_required
 def edit_client(request, client_id):
-    client = get_object_or_404(Client, id=client_id)
+    client = get_object_or_404(Client, pk=client_id)
     if request.method == 'POST':
-        form = ClientCreationForm(request.POST, request.FILES, instance=client)
+        form = ClientForm(request.POST, instance=client)
         if form.is_valid():
             form.save()
-            return redirect('dashboard')
+            return redirect('dashboard')  # Możesz przekierować na inną stronę
     else:
-        form = ClientCreationForm(instance=client)
+        form = ClientForm(instance=client)
     return render(request, 'orders/edit_client.html', {'form': form})
 
 @login_required
@@ -251,17 +232,6 @@ def create_order(request):
         form = OrderForm(request.POST, request.FILES)
         if form.is_valid():
             order = form.save(commit=False)
-            # Oblicz total_cost
-            total_cost = Decimal('0.00')
-            price_fields = ['lamp_price', 'vase_price', 'ball_price', 'covering_price', 'monument_cost', 'old_monument_removal', 'cemetery_fee', 'transport_cost', 'other_costs_price']
-            for field in price_fields:
-                value = getattr(order, field, 0)
-                if value:
-                    try:
-                        total_cost += Decimal(value)
-                    except InvalidOperation:
-                        pass  # Ignoruj wartości, które nie mogą być przekonwertowane na Decimal
-            order.total_cost = total_cost
             order.save()
             # Dodaj zadania na podstawie wybranego szablonu
             template = order.template
@@ -427,4 +397,3 @@ def material_edit(request, pk):
     else:
         form = MaterialForm(instance=material)
     return render(request, 'orders/material_form.html', {'form': form})
-

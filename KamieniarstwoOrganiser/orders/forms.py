@@ -121,6 +121,10 @@ class ClientCreationForm(forms.ModelForm):
             'mailing_address': 'Adres korespondencyjny',
             'pesel': 'PESEL',
         }
+class ClientForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = ['first_name', 'last_name', 'phone', 'alternative_phone', 'email', 'mailing_address', 'pesel']
 
 class TaskForm(forms.ModelForm):
     class Meta:

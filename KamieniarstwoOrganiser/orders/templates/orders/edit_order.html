@@ -1,9 +1,10 @@
 {% extends 'orders/base.html' %}
+{% load custom_filters %}
 
-{% block title %}Stwórz Zlecenie{% endblock %}
+{% block title %}Edytuj Zlecenie{% endblock %}
 
 {% block content %}
-<h2>Stwórz Zlecenie</h2>
+<h2>Edytuj Zlecenie</h2>
 <form method="post" enctype="multipart/form-data" class="form-container">
     {% csrf_token %}
     <table class="table">
@@ -18,39 +19,18 @@
         </tr>
         {% endif %}
         <tr class="form-group">
-            {% if field.name in booleanFields %}
             <td>
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             </td>
             <td>
                 {{ field }}
+                {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
             </td>
-            {% if field.name != 'covering' %}
-            <td>
-                <input type="number" step="0.01" class="form-control price-field" id="id_{{ field.name }}_price" name="{{ field.name }}_price" style="display: none;">
-            </td>
-            {% endif %}
-            {% elif field.name == 'covering_material' or field.name == 'covering_quantity' %}
-            <td colspan="3" class="covering-fields" style="display: none;">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-            </td>
-            {% elif field.name != 'lamp_price' and field.name != 'vase_price' and field.name != 'ball_price' %}
-            <td colspan="3">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-            </td>
-            {% endif %}
-            {% if field.help_text %}
-            <td colspan="3">
-                <small class="form-text text-muted">{{ field.help_text }}</small>
-            </td>
-            {% endif %}
-            {% for error in field.errors %}
-            <td colspan="3">
-                <div class="text-danger">{{ error }}</div>
-            </td>
-            {% endfor %}
         </tr>
         {% endfor %}
         <!-- Pole tylko do odczytu dla kosztów obłożenia -->
@@ -65,20 +45,23 @@
         <label for="total_cost">Suma kosztów:</label>
         <input type="number" step="0.01" class="form-control" id="total_cost" readonly>
     </div>
-    <button type="submit" class="btn btn-primary">Stwórz Zlecenie</button>
+    <button type="submit" class="btn btn-primary">Zapisz Zlecenie</button>
 </form>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const booleanFields = ['lamp', 'vase', 'ball', 'covering'];
-    const priceFields = ['lamp_price', 'vase_price', 'ball_price', 'curbs_price', 'monument_cost', 'old_monument_removal', 'cemetery_fee', 'transport_cost', 'other_costs_price'];
-    
+    const priceFields = ['lamp_price', 'vase_price', 'ball_price', 'curbs_price', 'monument_cost', 'old_monument_removal', 'cemetery_fee', 'transport_cost', 'other_costs_price', 'other_accessories_price'];
+
     function calculateTotalCost() {
         let totalCost = 0;
+        console.log("Obliczanie sumy kosztów:");
         priceFields.forEach(field => {
             const priceField = document.querySelector(`#id_${field}`);
             if (priceField && priceField.value) {
-                totalCost += parseFloat(priceField.value) || 0;
+                const value = parseFloat(priceField.value) || 0;
+                console.log(`${field}: ${value}`);
+                totalCost += value;
             }
         });
         const coveringCheckbox = document.querySelector('#id_covering');
@@ -86,39 +69,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const coveringMaterial = document.querySelector('#id_covering_material');
             const coveringQuantity = document.querySelector('#id_covering_quantity');
             if (coveringMaterial && coveringQuantity && coveringQuantity.value) {
-                const materialPrice = parseFloat(coveringMaterial.options[coveringMaterial.selectedIndex].dataset.price);
-                const quantity = parseFloat(coveringQuantity.value);
-                if (!isNaN(materialPrice) && !isNaN(quantity)) {
-                    const coveringCost = materialPrice * quantity + 70;
-                    totalCost += coveringCost;
-                    document.querySelector('#id_covering_cost').value = coveringCost.toFixed(2);
-                }
+                const materialPrice = parseFloat(coveringMaterial.options[coveringMaterial.selectedIndex].dataset.price) || 0;
+                const quantity = parseFloat(coveringQuantity.value) || 0;
+                const coveringCost = materialPrice * quantity + 70;
+                console.log(`covering_cost: ${coveringCost}`);
+                totalCost += coveringCost;
+                document.querySelector('#id_covering_cost').value = coveringCost.toFixed(2);
             }
         }
+        console.log(`Suma kosztów: ${totalCost}`);
         document.querySelector('#total_cost').value = totalCost.toFixed(2);
-    }
-
-    booleanFields.forEach(field => {
-        const checkbox = document.querySelector(`#id_${field}`);
-        const priceField = document.querySelector(`#id_${field}_price`);
-        if (checkbox && priceField) {
-            priceField.style.display = checkbox.checked ? 'block' : 'none';
-            checkbox.addEventListener('change', function() {
-                priceField.style.display = checkbox.checked ? 'block' : 'none';
-                calculateTotalCost();
-            });
-        }
-    });
-
-    const coveringCheckbox = document.querySelector('#id_covering');
-    const coveringFields = document.querySelectorAll('.covering-fields');
-    if (coveringCheckbox) {
-        coveringCheckbox.addEventListener('change', function() {
-            coveringFields.forEach(field => {
-                field.style.display = coveringCheckbox.checked ? 'block' : 'none';
-            });
-            calculateTotalCost();
-        });
     }
 
     priceFields.forEach(field => {

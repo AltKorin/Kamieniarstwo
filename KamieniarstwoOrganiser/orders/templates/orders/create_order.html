@@ -57,13 +57,13 @@
         <tr class="form-group covering-fields" style="display: none;">
             <td colspan="3">
                 <label for="id_covering_cost">Koszt obłożenia</label>
-                <input type="text" class="form-control" id="id_covering_cost" readonly>
+                <input type="number" step="0.01" class="form-control" id="id_covering_cost" readonly>
             </td>
         </tr>
     </table>
     <div class="form-group">
         <label for="total_cost">Suma kosztów:</label>
-        <input type="text" class="form-control" id="total_cost" readonly>
+        <input type="number" step="0.01" class="form-control" id="total_cost" readonly>
     </div>
     <button type="submit" class="btn btn-primary">Stwórz Zlecenie</button>
 </form>
@@ -71,15 +71,17 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const booleanFields = ['lamp', 'vase', 'ball', 'covering'];
-    const priceFields = ['lamp_price', 'vase_price', 'ball_price', 'curbs_price', 'monument_cost', 'old_monument_removal', 'cemetery_fee', 'transport_cost', 'other_costs_price'];
+    const priceFields = ['lamp_price', 'vase_price', 'ball_price', 'curbs_price', 'monument_cost', 'old_monument_removal', 'cemetery_fee', 'transport_cost', 'other_costs_price', 'other_accessories_price'];
     
     function calculateTotalCost() {
         let totalCost = 0;
-        // Sumujemy wartości pól cenowych, zabezpieczając przed NaN
+        console.log("Obliczanie sumy kosztów:");
         priceFields.forEach(field => {
             const priceField = document.querySelector(`#id_${field}`);
             if (priceField && priceField.value) {
-                totalCost += parseFloat(priceField.value) || 0;
+                const value = parseFloat(priceField.value) || 0;
+                console.log(`${field}: ${value}`);
+                totalCost += value;
             }
         });
         const coveringCheckbox = document.querySelector('#id_covering');
@@ -87,14 +89,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const coveringMaterial = document.querySelector('#id_covering_material');
             const coveringQuantity = document.querySelector('#id_covering_quantity');
             if (coveringMaterial && coveringQuantity && coveringQuantity.value) {
-                // Używamy operatora || 0, aby w przypadku nieprawidłowej wartości użyć 0
                 const materialPrice = parseFloat(coveringMaterial.options[coveringMaterial.selectedIndex].dataset.price) || 0;
                 const quantity = parseFloat(coveringQuantity.value) || 0;
                 const coveringCost = materialPrice * quantity + 70;
+                console.log(`covering_cost: ${coveringCost}`);
                 totalCost += coveringCost;
                 document.querySelector('#id_covering_cost').value = coveringCost.toFixed(2);
             }
         }
+        console.log(`Suma kosztów: ${totalCost}`);
         document.querySelector('#total_cost').value = totalCost.toFixed(2);
     }
 
