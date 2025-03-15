@@ -1,5 +1,10 @@
 import os
 from pathlib import Path
+import dj_database_url
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Ścieżka bazowa
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,7 +16,7 @@ SECRET_KEY = 'twoj-sekret-klucz'
 DEBUG = True
 
 # Ustawienia hostów – w produkcji dodaj adres Twojej aplikacji na Heroku
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://kamieniastwotestowy-3ac1b44cb12d.herokuapp.com/']
 
 # Zainstalowane aplikacje
 INSTALLED_APPS = [
@@ -57,6 +62,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,6 +125,8 @@ USE_TZ = True
 # Konfiguracja plików statycznych
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

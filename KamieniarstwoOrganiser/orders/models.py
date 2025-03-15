@@ -47,6 +47,69 @@ class OrderTemplate(models.Model):
 
     def __str__(self):
         return self.get_name_display()
+    
+    def get_default_tasks(self):
+        if self.name == 'nagrobek':
+            return [
+                {'name': 'Zdjęcie miejsca przed', 'description': 'Wykonanie zdjęcia miejsca przed rozpoczęciem prac.'},
+                {'name': 'Demontaż starego nagrobka', 'description': 'Demontaż istniejącego nagrobka.'},
+                {'name': 'Materiał', 'description': 'Zamówienie i przygotowanie materiałów.'},
+                {'name': 'Elementy', 'description': 'Przygotowanie elementów nagrobka.'},
+                {'name': 'Galanteria', 'description': 'Zakup galanterii nagrobnej.'},
+                {'name': 'Podkłady', 'description': 'Wykonanie podkładów pod nagrobek.'},
+                {'name': 'Ramka', 'description': 'Montaż ramki nagrobka.'},
+                {'name': 'Tablica', 'description': 'Przygotowanie i montaż tablicy.'},
+                {'name': 'Napisy / Litery', 'description': 'Wykonanie napisów i liter.'},
+                {'name': 'Elementy dodatkowe', 'description': 'Montaż elementów dodatkowych.'},
+                {'name': 'Odbiór i sprzątanie po montażu', 'description': 'Odbiór i sprzątanie po montażu nagrobka.'},
+                {'name': 'Zdjęcie po pracy', 'description': 'Wykonanie zdjęcia po zakończeniu prac.'},
+            ]
+        elif self.name == 'oblozenie':
+            return [
+                {'name': 'Zdjęcie miejsca przed', 'description': 'Wykonanie zdjęcia miejsca przed rozpoczęciem prac.'},
+                {'name': 'Wymierzenie obłożenia', 'description': 'Wymierzenie obłożenia'},
+                {'name': 'Materiał ', 'description': 'Materiał '},
+                {'name': 'Beton', 'description': 'Beton'},
+                {'name': 'Wycięcie drzew / korzeni po pracy', 'description': 'Wycięcie drzew / korzeni po zakończeniu prac.'},
+                {'name': 'Odbiór i sprzątanie po montażu', 'description': 'Odbiór i sprzątanie po montażu obłożenia.'},
+                {'name': 'Zdjęcie po pracy', 'description': 'Wykonanie zdjęcia po zakończeniu prac.'},
+            ]
+        elif self.name == 'podniesienie_nagrobka':
+            return [
+                {'name': 'Zdjęcie miejsca przed', 'description': 'Wykonanie zdjęcia miejsca przed rozpoczęciem prac.'},
+                {'name': 'Demontaż starego nagrobka', 'description': 'Demontaż istniejącego nagrobka.'},
+                {'name': 'Oczyszczenie', 'description': 'Oczyszczenie miejsca po demontażu.'},
+                {'name': 'Montaż nowego nagrobka', 'description': 'Montaż nowego nagrobka.'},
+                {'name': 'Przełożenie obłożenia', 'description': 'Przełożenie obłożenia.'},
+                {'name': 'Fugowanie', 'description': 'Fugowanie obłożenia.'},
+                {'name': 'Odbiór i sprzątanie po montażu', 'description': 'Odbiór i sprzątanie po montażu nagrobka.'},
+                {'name': 'Zdjęcie po pracy', 'description': 'Wykonanie zdjęcia po zakończeniu prac.'},
+            ]
+        elif self.name == 'dopiska_po_pogrzebie':
+            return [
+                {'name': 'Zdjęcie miejsca przed', 'description': 'Wykonanie zdjęcia miejsca przed rozpoczęciem prac.'},
+                {'name': 'Demontaż tablicy', 'description': 'Demontaż tablicy.'},
+                {'name': 'Napis', 'description': 'Napis'},
+                {'name': 'Montaż nowej tablicy', 'description': 'Montaż nowej tablicy.'},
+                {'name': 'Przełożenie obłożenia', 'description': 'Przełożenie obłożenia.'},
+                {'name': 'Odbiór i sprzątanie po montażu', 'description': 'Odbiór i sprzątanie po montażu nagrobka.'},
+                {'name': 'Zdjęcie po pracy', 'description': 'Wykonanie zdjęcia po zakończeniu prac.'},
+            ]
+        elif self.name == 'ekshumacja':
+            return [
+                {'name': 'Dokumenty z Sanepidu', 'description': 'Dokumenty z Sanepidu.'},
+                {'name':'Dokumenty od konserwatora', 'description': 'Dokumenty od konserwatora.'},
+                {'name': 'Demontaż na cmentarzu odbioru', 'description': 'Demontaż na cmentarzu odbioru.'},
+                {'name': 'Tablica zabrana do dopiski', 'description': 'Tablica zabrana do dopiski.'},
+                {'name': 'Kremacja', 'description': 'Kremacja.'},
+                {'name': 'Ekshumacja', 'description': 'Ekshumacja.'},
+                {'name': 'Montaż ponowny', 'description': 'Montaż ponowny.'},
+                {'name': 'Zdjęcie miejsca po pracy', 'description': 'Zdjęcie miejsca po pracy.'},
+                ]
+        else:
+            return [
+                
+            ]
 
 class Order(models.Model):
     
@@ -147,6 +210,14 @@ class Order(models.Model):
         total_cost = self.total_cost or Decimal('0.00')
         total_paid = self.calculate_total_paid()
         return total_cost - total_paid
+    
+    def progress(self):
+        tasks = self.tasks.all()
+        if not tasks:
+            return 0
+        completed = tasks.filter(completed=True).count()
+        total = tasks.count()
+        return int((completed / total) * 100)
 
 
     def save(self, *args, **kwargs):
@@ -164,17 +235,9 @@ class Order(models.Model):
     def remaining_payment(self):
         return self.calculate_remaining_payment()
 
-class TaskTemplate(models.Model):
-    order_template = models.ForeignKey(OrderTemplate, on_delete=models.CASCADE, related_name='task_templates')
-    name = models.CharField("Nazwa zadania", max_length=100, unique=True)
-    description = models.TextField("Opis zadania", blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
 class Task(models.Model):
-    task_template = models.ForeignKey(TaskTemplate, on_delete=models.CASCADE, related_name='tasks')
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)  # Zaktualizowane pole
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True, related_name='tasks')  # Zaktualizowane pole
+    order_template = models.ForeignKey(OrderTemplate, on_delete=models.CASCADE, null=True, blank=True, related_name='tasks')  # Dodane pole
     name = models.CharField(max_length=255)
     description = models.TextField(default='Brak opisu')
     assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -183,20 +246,8 @@ class Task(models.Model):
     image = models.ImageField("Zdjęcie", upload_to='task_images/', blank=True, null=True)  # Dodane pole
 
     def progress(self):
-        subtasks = self.subtasks.all()
-        if not subtasks:
-            return 0
-        completed = subtasks.filter(completed=True).count()
-        total = subtasks.count()
-        return int((completed / total) * 100)
-    
-    def __str__(self):
-        return self.name
-
-class SubTask(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='subtasks')
-    name = models.CharField("Nazwa podzadania", max_length=100)
-    completed = models.BooleanField("Wykonane", default=False)
+        # Bez podzadań postęp zadania opieramy tylko na jego stanie ukończenia:
+        return 100 if self.completed else 0
     
     def __str__(self):
         return self.name
@@ -218,3 +269,11 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Płatność {self.id} dla {self.client}"    
+
+class Report(models.Model):
+    date = models.DateField("Data raportu", unique=True)
+    pdf = models.FileField("Plik PDF", upload_to='reports/')
+    created_at = models.DateTimeField("Data utworzenia", auto_now_add=True)
+
+    def __str__(self):
+        return f"Raport z {self.date}"

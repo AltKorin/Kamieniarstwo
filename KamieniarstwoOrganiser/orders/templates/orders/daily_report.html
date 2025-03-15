@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <title>Raport dzienny - {{ today }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+      body {
+        font-size: 12px;
+        margin: 20px;
+      }
+      .card {
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      .card-header {
+        background-color: #f7f7f7;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+      }
+      th, td {
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #e9ecef;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Nagłówek raportu -->
+      <div class="card">
+        <div class="card-header">Raport dzienny - {{ today }}</div>
+      </div>
+      
+      <!-- Sekcja zleceń -->
+      <div class="card">
+        <div class="card-header">Zlecenia</div>
+        <div class="card-body">
+          {% if orders %}
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Klient</th>
+                <th>Szablon</th>
+                <th>Status</th>
+                <th>Kwota</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in orders %}
+              <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.client }}</td>
+                <td>{{ order.template }}</td>
+                <td>{{ order.get_status_display }}</td>
+                <td>{{ order.total_cost }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>Brak zleceń.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Sekcja zadań -->
+      <div class="card">
+        <div class="card-header">Zadania</div>
+        <div class="card-body">
+          {% if tasks %}
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Zlecenie</th>
+                <th>Nazwa</th>
+                <th>Przydzielony</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in tasks %}
+              <tr>
+                <td>{{ task.id }}</td>
+                <td>{{ task.order }}</td>
+                <td>{{ task.name }}</td>
+                <td>{{ task.assigned_to }}</td>
+                <td>{{ task.completed|yesno:"Ukończone,Nieukończone" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>Brak zadań.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Sekcja płatności -->
+      <div class="card">
+        <div class="card-header">Płatności</div>
+        <div class="card-body">
+          {% if payments %}
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Zlecenie</th>
+                <th>Kwota</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for payment in payments %}
+              <tr>
+                <td>{{ payment.id }}</td>
+                <td>{{ payment.order }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.date }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>Brak płatności.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+```  
+
+W tej wersji:
+- Używamy kontenera Bootstrapa oraz klas kart, tak jak w dashboardzie.
+- Każda sekcja (Zlecenia, Zadania, Płatności) jest opakowana w kartę z nagłówkiem i ciałem, co zapewnia spójny wygląd.
+- Tabele mają obramowanie i nagłówki z szarym tłem, co odpowiada stylistyce reszty aplikacji.
+
+Ten szablon będzie wykorzystywany przez WeasyPrint do generowania PDF – raport będzie możliwy do pobrania i stylistycznie dopasowany do reszty interfejsu.<!-- filepath: c:\Users\konra\KamieniarstwoOrganiser\KamieniarstwoOrganiser\orders\templates\orders\daily_report.html -->
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <title>Raport dzienny - {{ today }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+      body {
+        font-size: 12px;
+        margin: 20px;
+      }
+      .card {
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+      }
+      .card-header {
+        background-color: #f7f7f7;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+      }
+      th, td {
+        border: 1px solid #dee2e6;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #e9ecef;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Nagłówek raportu -->
+      <div class="card">
+        <div class="card-header">Raport dzienny - {{ today }}</div>
+      </div>
+      
+      <!-- Sekcja zleceń -->
+      <div class="card">
+        <div class="card-header">Zlecenia</div>
+        <div class="card-body">
+          {% if orders %}
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Klient</th>
+                <th>Szablon</th>
+                <th>Status</th>
+                <th>Kwota</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in orders %}
+              <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.client }}</td>
+                <td>{{ order.template }}</td>
+                <td>{{ order.get_status_display }}</td>
+                <td>{{ order.total_cost }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>Brak zleceń.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Sekcja zadań -->
+      <div class="card">
+        <div class="card-header">Zadania</div>
+        <div class="card-body">
+          {% if tasks %}
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Zlecenie</th>
+                <th>Nazwa</th>
+                <th>Przydzielony</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in tasks %}
+              <tr>
+                <td>{{ task.id }}</td>
+                <td>{{ task.order }}</td>
+                <td>{{ task.name }}</td>
+                <td>{{ task.assigned_to }}</td>
+                <td>{{ task.completed|yesno:"Ukończone,Nieukończone" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>Brak zadań.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Sekcja płatności -->
+      <div class="card">
+        <div class="card-header">Płatności</div>
+        <div class="card-body">
+          {% if payments %}
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Zlecenie</th>
+                <th>Kwota</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for payment in payments %}
+              <tr>
+                <td>{{ payment.id }}</td>
+                <td>{{ payment.order }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.date }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>Brak płatności.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+```  
+
+W tej wersji:
+- Używamy kontenera Bootstrapa oraz klas kart, tak jak w dashboardzie.
+- Każda sekcja (Zlecenia, Zadania, Płatności) jest opakowana w kartę z nagłówkiem i ciałem, co zapewnia spójny wygląd.
+- Tabele mają obramowanie i nagłówki z szarym tłem, co odpowiada stylistyce reszty aplikacji.
+
+Ten szablon będzie wykorzystywany przez WeasyPrint do generowania PDF – raport będzie możliwy do pobrania i stylistycznie dopasowany do reszty interfejsu.

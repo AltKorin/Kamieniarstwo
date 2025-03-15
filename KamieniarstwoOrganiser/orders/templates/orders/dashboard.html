@@ -60,7 +60,21 @@
                 </div>
             </div>
         </div>
+         <!-- Nowa karta dla szablonów zleceń -->
+    <div class="col-md-3">
+        <div class="card text-white bg-secondary mb-3">
+          <div class="card-header">Szablony Zleceń</div>
+          <div class="card-body">
+            <h5 class="card-title">{{ order_templates.count }}</h5>
+            <p class="card-text">Liczba szablonów</p>
+            <a href="{% url 'order_template_list' %}" class="btn btn-light">Przeglądaj szablony</a>
+            <a href="{% url 'create_order_template' %}" class="btn btn-light mt-2">Nowy Szablon</a>
+          </div>
+        </div>
+      </div>
     </div>
+
+    
 
     <h2>Zlecenia</h2>
     <table class="table table-striped">
@@ -87,6 +101,7 @@
                 <td>{{ order.total_paid }}</td>
                 <td>{{ order.remaining_payment }}</td>
                 <td>
+                    <a href="{% url 'order_detail' order.id %}" class="btn btn-sm btn-warning">Szczegóły</a> 
                     <a href="{% url 'edit_order' order.id %}" class="btn btn-sm btn-warning">Edytuj</a>
                     <a href="{% url 'delete_order' order.id %}" class="btn btn-sm btn-danger">Usuń</a>
                 </td>

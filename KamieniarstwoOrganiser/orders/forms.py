@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User  # Import domyślnego modelu użytkownika
-from .models import Order, Client, Task, SubTask, Payment, Employee, Material, OrderTemplate, TaskTemplate
+from .models import Order, Client, Task, Payment, Employee, Material, OrderTemplate
 
 class SignUpForm(UserCreationForm):
     username = forms.CharField(max_length=150, label='Nazwa użytkownika')
@@ -129,20 +129,16 @@ class ClientForm(forms.ModelForm):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['order', 'name', 'description', 'assigned_to', 'completed', 'image']
+        fields = ['order', 'order_template', 'name', 'description', 'assigned_to', 'completed', 'image']
         labels = {
             'order': 'Zlecenie',
+            'order_template': 'Szablon zlecenia',
             'name': 'Nazwa zadania',
             'description': 'Opis',
             'assigned_to': 'Przypisany pracownik',
             'completed': 'Zakończone',
             'image': 'Zdjęcie'
         }
-
-class SubTaskForm(forms.ModelForm):
-    class Meta:
-        model = SubTask
-        fields = ['name', 'completed']
 
 class PaymentForm(forms.ModelForm):
     class Meta:
@@ -159,13 +155,34 @@ class PaymentForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
 
-class TaskTemplateForm(forms.ModelForm):
+class OrderTemplateForm(forms.ModelForm):
+    custom_name = forms.CharField(required=False, label="Nazwa własna")
+
     class Meta:
-        model = TaskTemplate
-        fields = ['order_template', 'name', 'description']
+        model = OrderTemplate
+        fields = ['name', 'custom_name', 'description']
         labels = {
-            'order_template': 'Szablon zlecenia',
+            'name': 'Wybierz szablon',
+            'description': 'Opis',
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        custom_name = cleaned_data.get('custom_name')
+
+        if name == 'nowy_szablon':
+            if not custom_name:
+                raise forms.ValidationError("Podaj nazwę własną dla nowego szablonu.")
+            # Ustawiamy pole name na wartość wpisaną w custom_name
+            cleaned_data['name'] = custom_name
+        return cleaned_data
+
+class TemplateTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['name', 'description']
+        labels = {
             'name': 'Nazwa zadania',
             'description': 'Opis zadania',
         }
-

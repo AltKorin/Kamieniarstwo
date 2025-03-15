@@ -2,14 +2,18 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
-from .forms import EmployeeEditForm, SignUpForm, OrderForm, ShortOrderForm, TaskForm, SubTaskForm, PaymentForm, MaterialForm
-from .models import Order, Task, SubTask, Photo, Client, Payment, Employee, TaskTemplate, Material
+from .forms import EmployeeEditForm, SignUpForm, OrderForm, TaskForm, PaymentForm, MaterialForm, OrderTemplateForm
+from .models import Order, Task, Photo, Client, Payment, Employee, OrderTemplate, Material, Report
 from django.contrib.auth import views as auth_views
 from django.db import IntegrityError
 from decimal import Decimal, InvalidOperation
 from .forms import ClientCreationForm
-from .forms import TaskTemplateForm
 from .forms import ClientForm
+import datetime
+from django.template.loader import render_to_string
+from django.core.files.base import ContentFile
+from django.http import HttpResponse
+from weasyprint import HTML
 
 def signup(request):
     if request.method == 'POST':
@@ -61,6 +65,7 @@ def dashboard(request):
     payments = Payment.objects.all()
     tasks = Task.objects.all()
     employees = Employee.objects.all()
+    order_templates = OrderTemplate.objects.all()
 
     context = {
         'orders': orders,
@@ -68,6 +73,7 @@ def dashboard(request):
         'payments': payments,
         'tasks': tasks,
         'employees': employees,
+        'order_templates': order_templates,
     }
     return render(request, 'orders/dashboard.html', context)
 
@@ -148,7 +154,7 @@ def edit_task(request, task_id):
             return redirect('view_task', task_id=task.id)
     else:
         form = TaskForm(instance=task)
-    return render(request, 'orders/edit_task.html', {'form': form})
+    return render(request, 'orders/edit_task.html', {'form': form, 'task': task})
 
 @login_required
 def delete_task(request, task_id):
@@ -161,34 +167,7 @@ def delete_task(request, task_id):
 @login_required
 def view_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    subtasks = task.subtasks.all()
-    return render(request, 'orders/view_task.html', {'task': task, 'subtasks': subtasks})
-
-@login_required
-def create_subtask(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-    if request.method == 'POST':
-        form = SubTaskForm(request.POST)
-        if form.is_valid():
-            subtask = form.save(commit=False)
-            subtask.task = task
-            subtask.save()
-            return redirect('view_task', task_id=task.id)
-    else:
-        form = SubTaskForm()
-    return render(request, 'orders/create_subtask.html', {'form': form, 'task': task})
-
-@login_required
-def edit_subtask(request, subtask_id):
-    subtask = get_object_or_404(SubTask, id=subtask_id)
-    if request.method == 'POST':
-        form = SubTaskForm(request.POST, instance=subtask)
-        if form.is_valid():
-            form.save()
-            return redirect('view_task', task_id=subtask.task.id)
-    else:
-        form = SubTaskForm(instance=subtask)
-    return render(request, 'orders/edit_subtask.html', {'form': form, 'subtask': subtask})
+    return render(request, 'orders/view_task.html', {'task': task})
 
 @login_required
 def create_client(request):
@@ -211,7 +190,7 @@ def edit_client(request, client_id):
             return redirect('dashboard')  # Możesz przekierować na inną stronę
     else:
         form = ClientForm(instance=client)
-    return render(request, 'orders/edit_client.html', {'form': form})
+    return render(request, 'orders/edit_client.html', {'form': form, 'client': client})
 
 @login_required
 def delete_client(request, client_id):
@@ -221,27 +200,20 @@ def delete_client(request, client_id):
         return redirect('dashboard')
     return render(request, 'orders/delete_client.html', {'client': client})
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .forms import OrderForm
-from .models import Order, Task, TaskTemplate
-
 @login_required
 def create_order(request):
     if request.method == 'POST':
         form = OrderForm(request.POST, request.FILES)
         if form.is_valid():
-            order = form.save(commit=False)
-            order.save()
-            # Dodaj zadania na podstawie wybranego szablonu
+            order = form.save()
             template = order.template
-            task_templates = TaskTemplate.objects.filter(order_template=template)
-            for task_template in task_templates:
+            default_tasks = template.get_default_tasks()
+            for task_data in default_tasks:
                 Task.objects.create(
                     order=order,
-                    task_template=task_template,  # Ustawienie task_template
-                    name=task_template.name,
-                    description=task_template.description
+                    order_template=template,
+                    name=task_data['name'],
+                    description=task_data['description']
                 )
             return redirect('orders')
     else:
@@ -259,7 +231,7 @@ def edit_payment(request, payment_id):
             return redirect('dashboard')
     else:
         form = PaymentForm(instance=payment)
-    return render(request, 'orders/edit_payment.html', {'form': form})
+    return render(request, 'orders/edit_payment.html', {'form': form, 'payment': payment})
 @login_required
 def delete_payment(request, payment_id):
     payment = get_object_or_404(Payment, id=payment_id)
@@ -335,44 +307,6 @@ def edit_payment(request, payment_id):
         form = PaymentForm(instance=payment)
     return render(request, 'orders/payment_form.html', {'form': form})
 
-from .forms import TaskTemplateForm
-from .models import TaskTemplate
-
-def add_task_template(request):
-    if request.method == 'POST':
-        form = TaskTemplateForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('task_template_list')
-    else:
-        form = TaskTemplateForm()
-    return render(request, 'orders/add_task_template.html', {'form': form})
-
-def task_template_list(request):
-    if request.method == 'POST':
-        form = TaskTemplateForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('task_template_list')
-    else:
-        form = TaskTemplateForm()
-    
-    task_templates = TaskTemplate.objects.all()
-    return render(request, 'orders/task_template_list.html', {'task_templates': task_templates, 'form': form})
-
-def add_task(request, template_id):
-    task_template = get_object_or_404(TaskTemplate, id=template_id)
-    if request.method == 'POST':
-        form = TaskForm(request.POST, request.FILES)
-        if form.is_valid():
-            task = form.save(commit=False)
-            task.task_template = task_template
-            task.save()
-            return redirect('task_template_list')
-    else:
-        form = TaskForm(initial={'task_template': task_template})
-    return render(request, 'orders/add_task.html', {'form': form, 'task_template': task_template})
-
 def material_list(request):
     materials = Material.objects.all()
     return render(request, 'orders/material_list.html', {'materials': materials})
@@ -397,3 +331,89 @@ def material_edit(request, pk):
     else:
         form = MaterialForm(instance=material)
     return render(request, 'orders/material_form.html', {'form': form})
+
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+    tasks = order.template.tasks.all()
+    return render(request, 'orders/order_detail.html', {'order': order, 'tasks': tasks})
+
+@login_required
+def create_order_template(request):
+    if request.method == 'POST':
+        form = OrderTemplateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('order_template_list')
+    else:
+        form = OrderTemplateForm()
+    return render(request, 'orders/create_order_template.html', {'form': form})
+
+@login_required
+def order_template_list(request):
+    templates = OrderTemplate.objects.all()
+    return render(request, 'orders/order_template_list.html', {'templates': templates})
+
+@login_required
+def order_template_detail(request, template_id):
+    template = get_object_or_404(OrderTemplate, pk=template_id)
+    default_tasks = template.get_default_tasks()
+    added_tasks = Task.objects.filter(order_template=template)
+    return render(request, 'orders/order_template_detail.html', {
+        'template': template,
+        'default_tasks': default_tasks,
+        'added_tasks': added_tasks
+    })
+
+from django.shortcuts import get_object_or_404
+from .forms import TemplateTaskForm
+
+@login_required
+def add_template_task(request, template_id):
+    template = get_object_or_404(OrderTemplate, pk=template_id)
+    if request.method == 'POST':
+        form = TemplateTaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.order_template = template
+            task.save()
+            return redirect('order_template_detail', template_id=template.id)
+    else:
+        form = TemplateTaskForm()
+    return render(request, 'orders/add_template_task.html', {'form': form, 'template': template})
+
+@login_required
+def daily_report(request):
+    today = datetime.date.today()
+    report, created = Report.objects.get_or_create(date=today)
+    
+    orders = Order.objects.filter(created_at__date=today)
+    tasks = Task.objects.filter(created_at__date=today)
+    payments = Payment.objects.filter(date=today)
+
+    if not orders and not tasks and not payments:
+        # Jeśli nie ma żadnych danych, wyświetl komunikat
+        html_string = render_to_string('orders/daily_report_empty.html', {'today': today})
+        html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+        pdf_content = html.write_pdf()
+    else:
+        context = {
+            'today': today,
+            'orders': orders,
+            'tasks': tasks,
+            'payments': payments,
+        }
+        html_string = render_to_string('orders/daily_report.html', context)
+        html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+        pdf_content = html.write_pdf()
+
+    if created or not report.pdf:
+        # Zapis pliku PDF do pola FileField w modelu Report
+        pdf_file = ContentFile(pdf_content)
+        filename = f"daily_report_{today}.pdf"
+        report.pdf.save(filename, pdf_file)
+        report.save()
+    
+    response = HttpResponse(report.pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{report.pdf.name}"'
+    return response

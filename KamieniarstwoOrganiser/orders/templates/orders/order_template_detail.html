@@ -1,0 +1,34 @@
+{% extends "orders/base.html" %}
+{% block content %}
+  <h2>Szablon: {{ template.get_name_display }}</h2>
+  <p><strong>Opis:</strong> {{ template.description|default:"Brak opisu" }}</p>
+
+  <h3>Dodane zadania</h3>
+  {% if added_tasks %}
+    <ul>
+      {% for task in added_tasks %}
+        <li>
+          <strong>{{ task.name }}</strong>: {{ task.description }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Brak dodanych zadań.</p>
+  {% endif %}
+
+  <h3>Domyślne zadania</h3>
+  {% if default_tasks %}
+    <ul>
+      {% for task in default_tasks %}
+        <li>
+          <strong>{{ task.name }}</strong>: {{ task.description }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Brak domyślnych zadań.</p>
+  {% endif %}
+
+  <a href="{% url 'add_template_task' template.id %}" class="btn btn-primary">Dodaj nowe zadanie</a>
+  <a href="{% url 'order_template_list' %}" class="btn btn-secondary">Powrót do listy szablonów</a>
+{% endblock %}

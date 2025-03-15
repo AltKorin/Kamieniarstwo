@@ -7,26 +7,4 @@
 <p>Pracownik: {{ task.assigned_to }}</p>
 <p>Postęp: {{ task.progress }}%</p>
 
-<h3>Podzadania</h3>
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Nazwa</th>
-            <th>Wykonane</th>
-            <th>Akcje</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for subtask in subtasks %}
-        <tr>
-            <td>{{ subtask.name }}</td>
-            <td>{{ subtask.completed }}</td>
-            <td>
-                <a href="{% url 'edit_subtask' subtask.id %}" class="btn btn-warning btn-sm">Edytuj</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<a href="{% url 'create_subtask' task.id %}" class="btn btn-primary">Dodaj Podzadanie</a>
 {% endblock %}

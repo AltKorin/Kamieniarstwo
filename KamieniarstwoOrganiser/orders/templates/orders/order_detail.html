@@ -1,0 +1,49 @@
+{% extends 'orders/base.html' %}
+
+{% block content %}
+  <h2>Szczegóły zlecenia</h2>
+  <p>Klient: {{ order.client }}</p>
+  <p>Szablon: {{ order.template }}</p>
+  <p>Opis: {{ order.description }}</p>
+  <p>Status: {{ order.status }}</p>
+
+  <h3>Zadania:</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nazwa</th>
+        <th>Opis</th>
+        <th>Przypisany</th>
+        <th>Status</th>
+        <th>Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for task in tasks %}
+        <tr>
+          <td>{{ task.name }}</td>
+          <td>{{ task.description }}</td>
+          <td>
+            {% if task.assigned_to %}
+              {{ task.assigned_to }}
+            {% else %}
+              Brak
+            {% endif %}
+          </td>
+          <td>
+            {% if task.completed %}
+              Zakończone
+            {% else %}
+              W trakcie
+            {% endif %}
+          </td>
+          <td>
+            <a href="#">Edytuj</a> | <a href="#">Dodaj podzadanie</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="#">Dodaj nowe zadanie</a>
+{% endblock %}

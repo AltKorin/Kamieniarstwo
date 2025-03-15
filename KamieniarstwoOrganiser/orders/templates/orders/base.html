@@ -29,7 +29,6 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'create_order' %}">Stwórz Zlecenie</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'create_task' %}">Stwórz Zadanie</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'material_list' %}">Materiały</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'task_template_list' %}">Szablony Zleceń</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'clients' %}">Klienci</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'orders' %}">Zlecenia</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'payment_list' %}">Płatności</a></li> <!-- Dodano link do płatności -->
@@ -37,6 +36,8 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'reports' %}">Raporty</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'employees' %}">Pracownicy</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'task_list' %}">Zadania</a></li> <!-- Dodano link do listy zadań -->
+                <li class="nav-item"><a class="nav-link" href="{% url 'order_template_list' %}">Szablony Zleceń</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'create_order_template' %}">Nowy Szablon</a></li>
                 {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Wyloguj</a></li>
                 {% endif %}

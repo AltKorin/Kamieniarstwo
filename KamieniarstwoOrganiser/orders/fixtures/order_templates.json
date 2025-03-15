@@ -1,0 +1,50 @@
+[
+    {
+        "model": "orders.ordertemplate",
+        "pk": 1,
+        "fields": {
+            "name": "nagrobek",
+            "description": "Szablon dla nagrobka: Zdjęcie miejsca przed, Demontaż starego nagrobka, Materiał, Elementy, Galanteria, Podkłady, Ramka, Tablica, Napisy / Litery, Elementy dodatkowe, Odbiór i sprzątanie po montażu, Zdjęcie po pracy."
+        }
+    },
+    {
+        "model": "orders.ordertemplate",
+        "pk": 2,
+        "fields": {
+            "name": "oblozenie",
+            "description": "Szablon dla obłożenia: Zdjęcie miejsca przed, Wymierzenie obłożenia, Materiał, Beton, Wycięcie drzew / korzeni po pracy, Odbiór i sprzątanie po montażu, Zdjęcie po pracy."
+        }
+    },
+    {
+        "model": "orders.ordertemplate",
+        "pk": 3,
+        "fields": {
+            "name": "podniesienie_nagrobka",
+            "description": "Szablon dla podniesienia nagrobka: Zdjęcie miejsca przed, Demontaż starego nagrobka, Oczyszczenie, Montaż nowego nagrobka, Przełożenie obłożenia, Fugowanie, Odbiór i sprzątanie po montażu, Zdjęcie po pracy."
+        }
+    },
+    {
+        "model": "orders.ordertemplate",
+        "pk": 4,
+        "fields": {
+            "name": "dopiska_po_pogrzebie",
+            "description": "Szablon dla dopiski po pogrzebie: Zdjęcie miejsca przed, Demontaż tablicy, Napis, Montaż nowej tablicy, Przełożenie obłożenia, Odbiór i sprzątanie po montażu, Zdjęcie po pracy."
+        }
+    },
+    {
+        "model": "orders.ordertemplate",
+        "pk": 5,
+        "fields": {
+            "name": "ekshumacja",
+            "description": "Szablon dla ekshumacji: Dokumenty z Sanepidu, Dokumenty od konserwatora, Demontaż na cmentarzu odbioru, Tablica zabrana do dopiski, Kremacja, Ekshumacja, Montaż ponowny, Zdjęcie miejsca po pracy."
+        }
+    },
+    {
+        "model": "orders.ordertemplate",
+        "pk": 6,
+        "fields": {
+            "name": "nowy_szablon",
+            "description": "Własny nowy szablon – dostosuj zadania według potrzeb."
+        }
+    }
+]
