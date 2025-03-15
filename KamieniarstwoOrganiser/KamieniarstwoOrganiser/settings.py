@@ -9,7 +9,11 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Konfiguracja bazy danych
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(
+    conn_max_age=600,
+    default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}"
+)
 
 # Statyczne pliki
 STATIC_URL = '/static/'
