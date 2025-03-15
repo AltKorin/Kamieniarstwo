@@ -1,1 +1,1 @@
-web: gunicorn KamieniarstwoOrganiser.KamieniarstwoOrganiser.wsgi:application --log-file -
+web: cd KamieniarstwoOrganiser && gunicorn KamieniarstwoOrganiser.wsgi:application --log-file -
