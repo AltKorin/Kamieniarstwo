@@ -1,0 +1,164 @@
+/* Import Bootstrapa */
+@import url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+/* Ustawienie nowoczesnej biznesowej kolorystyki */
+:root {
+    --primary-color: #2C3E50; /* Ciemny granatowy, elegancki */
+    --secondary-color: #BDC3C7; /* Jasnoszary, delikatny kontrast */
+    --background-color: #ECF0F1; /* Bardzo jasnoszary, prawie biały */
+    --text-color: #2C3E50; /* Ciemny granatowy, wysoka czytelność */
+    --border-color: #95A5A6; /* Neutralny szary, delikatne odcięcie elementów */
+    --hover-color: #AAB7B8; /* Jaśniejszy odcień szarości dla interakcji */
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    margin-left: 250px; /* Zapobiega zakrywaniu treści przez navbar */
+}
+
+/* Stylizacja nagłówków */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-color);
+    font-weight: bold;
+    font-family: 'Playfair Display', serif;
+}
+
+/* Stylizacja tabel */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+}
+
+table thead {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+table th, table td {
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    text-align: left;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+table tbody tr:hover {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+/* Stylizacja formularzy */
+form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+input, select, textarea {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    width: 100%;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 5px var(--secondary-color);
+}
+
+/* Stylizacja przycisków */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    padding: 10px 20px;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: var(--hover-color);
+    border-color: var(--hover-color);
+}
+
+/* Stylizacja kart */
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Stylizacja nawigacji po lewej stronie */
+.navbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1100;
+}
+
+.navbar a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 12px;
+    display: block;
+    transition: background 0.3s, color 0.3s;
+    font-size: 18px;
+}
+
+.navbar a:hover {
+    background-color: var(--hover-color);
+    color: #2C3E50;
+}
+
+/* Poprawiona stylizacja checkboxów */
+table input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+table input[type="checkbox"]:hover {
+    box-shadow: 0 0 5px var(--hover-color);
+}
+
+table input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Responsywność: chowanie paska na małych ekranach */
+@media (max-width: 1024px) {
+    .navbar {
+        left: -220px;
+    }
+    .navbar.active {
+        left: 0;
+    }
+    body {
+        margin-left: 0;
+    }
+}

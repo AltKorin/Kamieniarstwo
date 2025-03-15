@@ -18,12 +18,6 @@ media/
 # If you are using Django migrations
 migrations/
 
-# If you are using Django static files
-staticfiles/
-
-# If you are using Django collectstatic
-static/
-
 # Python specific
 *.py[cod]
 *.pyo
