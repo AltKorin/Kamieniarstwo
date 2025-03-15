@@ -24,7 +24,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Klucz bezpieczeństwa, DEBUG, ALLOWED_HOSTS, INSTALLED_APPS itd.
 SECRET_KEY = 'twoj-sekret-klucz'
 DEBUG = True
-ALLOWED_HOSTS = ['kamieniastwotestowy-3ac1b44cb12d.herokuapp.com']
+ALLOWED_HOSTS = ['kamieniarstwoorganizer-7a872a51bbb1.herokuapp.com']
 
 # ... reszta ustawień ...
 
