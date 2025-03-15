@@ -1,22 +1,28 @@
 import os
 from pathlib import Path
 import dj_database_url
-DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+import os
+from pathlib import Path
+import dj_database_url
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Ścieżka bazowa
+# Ścieżka bazowa – definiujemy na samym początku!
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Klucz bezpieczeństwa – pamiętaj, aby go zmienić na produkcyjnym środowisku!
+# Konfiguracja bazy danych
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+
+# Statyczne pliki
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Klucz bezpieczeństwa, DEBUG, ALLOWED_HOSTS, INSTALLED_APPS itd.
 SECRET_KEY = 'twoj-sekret-klucz'
-
-# Debug powinien być wyłączony w produkcji
 DEBUG = True
+ALLOWED_HOSTS = ['kamieniastwotestowy-3ac1b44cb12d.herokuapp.com']
 
-# Ustawienia hostów – w produkcji dodaj adres Twojej aplikacji na Heroku
-ALLOWED_HOSTS = ['kamieniastwotestowy-3ac1b44cb12d.herokuapp.com/']
+# ... reszta ustawień ...
 
 # Zainstalowane aplikacje
 INSTALLED_APPS = [
