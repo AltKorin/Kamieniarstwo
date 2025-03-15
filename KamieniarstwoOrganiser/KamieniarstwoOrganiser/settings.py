@@ -16,7 +16,7 @@ SECRET_KEY = 'twoj-sekret-klucz'
 DEBUG = True
 
 # Ustawienia hostów – w produkcji dodaj adres Twojej aplikacji na Heroku
-ALLOWED_HOSTS = ['https://kamieniastwotestowy-3ac1b44cb12d.herokuapp.com/']
+ALLOWED_HOSTS = ['kamieniastwotestowy-3ac1b44cb12d.herokuapp.com/']
 
 # Zainstalowane aplikacje
 INSTALLED_APPS = [
@@ -92,13 +92,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'KamieniarstwoOrganiser.wsgi.application'
 
-# Konfiguracja bazy danych – używamy SQLite
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# # Konfiguracja bazy danych – używamy SQLite
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # Hasła – przykładowa konfiguracja walidatorów
 AUTH_PASSWORD_VALIDATORS = [
