@@ -24,9 +24,6 @@ staticfiles/
 # If you are using Django collectstatic
 static/
 
-# If you are using Django media files
-media/
-
 # Python specific
 *.py[cod]
 *.pyo
