@@ -15,9 +15,6 @@ media/
 # If you are using SQLite
 *.sqlite3
 
-# If you are using Django migrations
-migrations/
-
 # Python specific
 *.py[cod]
 *.pyo
